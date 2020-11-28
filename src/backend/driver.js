@@ -3,6 +3,7 @@ const stream = require('stream');
 const driverBase = require('../frontend/driver');
 const Analyser = require('./Analyser');
 const mysql = require('mysql');
+const { createBulkInsertStreamBase } = require('dbgate-tools');
 
 function extractColumns(fields) {
   if (fields)

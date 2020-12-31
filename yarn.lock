@@ -68,6 +68,11 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
+"@verycrazydog/mysql-parser@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@verycrazydog/mysql-parser/-/mysql-parser-1.2.0.tgz#6007a8dc8987c4b7c8fd10357ee52f31df9062bc"
+  integrity sha512-h3zGaAwDYbZwqEIxDLMGaDRhfznTxgLO9C2FUnAfdXKoaw+OAUkMGbkjs2Qi+pnxhrAOt4BXM9JwkMb6bY/iXA==
+
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.9.0.tgz#bd850604b4042459a5a41cd7d338cbed695ed964"

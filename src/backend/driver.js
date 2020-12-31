@@ -4,6 +4,7 @@ const driverBase = require('../frontend/driver');
 const Analyser = require('./Analyser');
 const mysql = require('mysql');
 const { createBulkInsertStreamBase } = require('dbgate-tools');
+const mysqlSplitter = require('@verycrazydog/mysql-parser');
 
 function extractColumns(fields) {
   if (fields)
@@ -13,12 +14,21 @@ function extractColumns(fields) {
   return null;
 }
 
+async function runQueryItem(connection, sql) {
+  return new Promise((resolve, reject) => {
+    connection.query(sql, function (error, results, fields) {
+      if (error) reject(error);
+      resolve({ rows: results, columns: extractColumns(fields) });
+    });
+  });
+}
+
 /** @type {import('dbgate-types').EngineDriver} */
 const driver = {
   ...driverBase,
   analyserClass: Analyser,
 
-  async connect( { server, port, user, password, database }) {
+  async connect({ server, port, user, password, database }) {
     const connection = mysql.createConnection({
       host: server,
       port,
@@ -36,12 +46,19 @@ const driver = {
         columns: [],
       };
     }
-    return new Promise((resolve, reject) => {
-      connection.query(sql, function (error, results, fields) {
-        if (error) reject(error);
-        resolve({ rows: results, columns: extractColumns(fields) });
-      });
-    });
+
+    const splitResult = mysqlSplitter.split(sql);
+    let res = {
+      rows: [],
+      columns: [],
+    };
+    for (const item of splitResult) {
+      const resultItem = await runQueryItem(connection, item);
+      if (resultItem.rows && resultItem.columns && resultItem.columns.length > 0) {
+        res = resultItem;
+      }
+    }
+    return res;
   },
   async stream(connection, sql, options) {
     const query = connection.query(sql);

@@ -23,44 +23,8 @@ async function runQueryItem(connection, sql) {
   });
 }
 
-/** @type {import('dbgate-types').EngineDriver} */
-const driver = {
-  ...driverBase,
-  analyserClass: Analyser,
-
-  async connect({ server, port, user, password, database }) {
-    const connection = mysql.createConnection({
-      host: server,
-      port,
-      user,
-      password,
-      database,
-    });
-    connection._database_name = database;
-    return connection;
-  },
-  async query(connection, sql) {
-    if (sql == null) {
-      return {
-        rows: [],
-        columns: [],
-      };
-    }
-
-    const splitResult = mysqlSplitter.split(sql);
-    let res = {
-      rows: [],
-      columns: [],
-    };
-    for (const item of splitResult) {
-      const resultItem = await runQueryItem(connection, item);
-      if (resultItem.rows && resultItem.columns && resultItem.columns.length > 0) {
-        res = resultItem;
-      }
-    }
-    return res;
-  },
-  async stream(connection, sql, options) {
+async function runStreamItem(connection, sql, options) {
+  return new Promise((resolve, reject) => {
     const query = connection.query(sql);
 
     // const handleInfo = (info) => {
@@ -74,9 +38,9 @@ const driver = {
     //   });
     // };
 
-    const handleEnd = (result) => {
+    const handleEnd = () => {
       // console.log('RESULT', result);
-      options.done(result);
+      resolve();
     };
 
     const handleRow = (row) => {
@@ -101,8 +65,54 @@ const driver = {
     };
 
     query.on('error', handleError).on('fields', handleFields).on('result', handleRow).on('end', handleEnd);
+  });
+}
 
-    return query;
+/** @type {import('dbgate-types').EngineDriver} */
+const driver = {
+  ...driverBase,
+  analyserClass: Analyser,
+
+  async connect({ server, port, user, password, database }) {
+    const connection = mysql.createConnection({
+      host: server,
+      port,
+      user,
+      password,
+      database,
+    });
+    connection._database_name = database;
+    return connection;
+  },
+  async query(connection, sql) {
+    if (sql == null) {
+      return {
+        rows: [],
+        columns: [],
+      };
+    }
+
+    const sqlSplitted = mysqlSplitter.split(sql);
+    let res = {
+      rows: [],
+      columns: [],
+    };
+    for (const sqlItem of sqlSplitted) {
+      const resultItem = await runQueryItem(connection, sqlItem);
+      if (resultItem.rows && resultItem.columns && resultItem.columns.length > 0) {
+        res = resultItem;
+      }
+    }
+    return res;
+  },
+  async stream(connection, sql, options) {
+    const sqlSplitted = mysqlSplitter.split(sql);
+
+    for (const sqlItem of sqlSplitted) {
+      await runStreamItem(connection, sqlItem, options);
+    }
+
+    options.done();
   },
   async readQuery(connection, sql, structure) {
     const query = connection.query(sql);

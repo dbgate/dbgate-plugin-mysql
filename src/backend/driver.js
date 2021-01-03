@@ -39,12 +39,19 @@ async function runStreamItem(connection, sql, options) {
     // };
 
     const handleEnd = () => {
-      // console.log('RESULT', result);
       resolve();
     };
 
     const handleRow = (row) => {
-      options.row(row);
+      if (row && row.constructor && row.constructor.name == 'OkPacket') {
+        options.info({
+          message: `${row.affectedRows} rows affected`,
+          time: new Date(),
+          severity: 'info',
+        });
+      } else {
+        options.row(row);
+      }
     };
 
     const handleFields = (columns) => {

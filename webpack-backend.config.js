@@ -15,9 +15,9 @@ var config = {
   },
 
   // uncomment for disable minimalization
-  optimization: {
-    minimize: false,
-  },
+  // optimization: {
+  //   minimize: false,
+  // },
 };
 
 module.exports = config;

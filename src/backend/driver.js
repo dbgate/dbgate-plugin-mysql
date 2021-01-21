@@ -2,7 +2,7 @@ const _ = require('lodash');
 const stream = require('stream');
 const driverBase = require('../frontend/driver');
 const Analyser = require('./Analyser');
-const mysql = require('mysql');
+const mysql2 = require('mysql2');
 const { createBulkInsertStreamBase } = require('dbgate-tools');
 const mysqlSplitter = require('@verycrazydog/mysql-parser');
 
@@ -81,7 +81,7 @@ const driver = {
   analyserClass: Analyser,
 
   async connect({ server, port, user, password, database }) {
-    const connection = mysql.createConnection({
+    const connection = mysql2.createConnection({
       host: server,
       port,
       user,

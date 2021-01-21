@@ -18,7 +18,7 @@ const driver = {
   dumperClass: Dumper,
   dialect,
   engine: 'mysql@dbgate-plugin-mysql',
-  title: 'MySQL',
+  title: 'MySQL / MariaDB',
 };
 
 module.exports = driver;

@@ -3,22 +3,33 @@ const stream = require('stream');
 const driverBase = require('../frontend/driver');
 const Analyser = require('./Analyser');
 const mysql2 = require('mysql2');
-const { createBulkInsertStreamBase } = require('dbgate-tools');
+const { createBulkInsertStreamBase, makeUniqueColumnNames } = require('dbgate-tools');
 const mysqlSplitter = require('@verycrazydog/mysql-parser');
 
 function extractColumns(fields) {
-  if (fields)
-    return fields.map((col) => ({
+  if (fields) {
+    const res = fields.map((col) => ({
       columnName: col.name,
     }));
+    makeUniqueColumnNames(res);
+    return res;
+  }
   return null;
+}
+
+function zipDataRow(rowArray, columns) {
+  return _.zipObject(
+    columns.map((x) => x.columnName),
+    rowArray
+  );
 }
 
 async function runQueryItem(connection, sql) {
   return new Promise((resolve, reject) => {
     connection.query(sql, function (error, results, fields) {
       if (error) reject(error);
-      resolve({ rows: results, columns: extractColumns(fields) });
+      const columns = extractColumns(fields);
+      resolve({ rows: results && results.map((row) => zipDataRow(row, columns)), columns });
     });
   });
 }
@@ -26,6 +37,7 @@ async function runQueryItem(connection, sql) {
 async function runStreamItem(connection, sql, options) {
   return new Promise((resolve, reject) => {
     const query = connection.query(sql);
+    let columns = [];
 
     // const handleInfo = (info) => {
     //   const { message, lineNumber, procName } = info;
@@ -50,13 +62,13 @@ async function runStreamItem(connection, sql, options) {
           severity: 'info',
         });
       } else {
-        options.row(row);
+        options.row(zipDataRow(row, columns));
       }
     };
 
-    const handleFields = (columns) => {
-      console.log('FIELDS', columns[0].name);
-      options.recordset(extractColumns(columns));
+    const handleFields = (fields) => {
+      columns = extractColumns(fields);
+      options.recordset(columns);
     };
 
     const handleError = (error) => {
@@ -87,6 +99,7 @@ const driver = {
       user,
       password,
       database,
+      rowsAsArray: true,
     });
     connection._database_name = database;
     return connection;
@@ -129,13 +142,17 @@ const driver = {
       highWaterMark: 100,
     });
 
+    let columns = [];
     query
       .on('error', (err) => {
         console.error(err);
         pass.end();
       })
-      .on('fields', (fields) => pass.write(structure || { columns: extractColumns(fields) }))
-      .on('result', (row) => pass.write(row))
+      .on('fields', (fields) => {
+        columns = extractColumns(fields);
+        pass.write(structure || { columns });
+      })
+      .on('result', (row) => pass.write(zipDataRow(row, columns)))
       .on('end', () => pass.end());
 
     return pass;

@@ -2,11 +2,11 @@
   "name": "dbgate-plugin-mysql",
   "main": "dist/backend.js",
   "version": "1.0.4",
-  "homepage": "https://github.com/dbshell/dbgate-plugin-mysql",
+  "homepage": "https://github.com/dbgate/dbgate-plugin-mysql",
   "description": "MySQL connect plugin for DbGate",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dbshell/dbgate-plugin-mysql.git"
+    "url": "https://github.com/dbgate/dbgate-plugin-mysql.git"
   },
   "funding": "https://www.paypal.com/paypalme/JanProchazkaCz/30eur",
   "author": "Jan Prochazka",

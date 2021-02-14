@@ -19,6 +19,7 @@ const driver = {
   dialect,
   engine: 'mysql@dbgate-plugin-mysql',
   title: 'MySQL / MariaDB',
+  defaultPort: 3306,
 };
 
 module.exports = driver;

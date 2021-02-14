@@ -92,14 +92,20 @@ const driver = {
   ...driverBase,
   analyserClass: Analyser,
 
-  async connect({ server, port, user, password, database }) {
+  async connect({ server, port, user, password, database, ssl }) {
     const connection = mysql2.createConnection({
       host: server,
       port,
       user,
       password,
       database,
+      ssl,
       rowsAsArray: true,
+      supportBigNumbers: true,
+      bigNumberStrings: true,
+      // TODO: test following options
+      // multipleStatements: true,
+      // dateStrings: true,
     });
     connection._database_name = database;
     return connection;

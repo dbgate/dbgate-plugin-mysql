@@ -1,7 +1,7 @@
 {
   "name": "dbgate-plugin-mysql",
   "main": "dist/backend.js",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "homepage": "https://github.com/dbgate/dbgate-plugin-mysql",
   "description": "MySQL connect plugin for DbGate",
   "repository": {

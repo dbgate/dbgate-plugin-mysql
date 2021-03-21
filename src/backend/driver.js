@@ -29,7 +29,7 @@ async function runQueryItem(connection, sql) {
     connection.query(sql, function (error, results, fields) {
       if (error) reject(error);
       const columns = extractColumns(fields);
-      resolve({ rows: results && results.map((row) => zipDataRow(row, columns)), columns });
+      resolve({ rows: results && results.map && results.map((row) => zipDataRow(row, columns)), columns });
     });
   });
 }

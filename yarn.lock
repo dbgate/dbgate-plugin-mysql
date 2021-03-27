@@ -951,10 +951,10 @@ dbgate-plugin-tools@^1.0.4:
     pacote "^11.1.13"
     rimraf "^3.0.2"
 
-dbgate-tools@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/dbgate-tools/-/dbgate-tools-1.0.8.tgz#a28edd6defac272bb96954e031d590920e88852c"
-  integrity sha512-G0rVIiI1dJEdYvk7jOaPRO8VwfnfUCw2Oa7v28Gx5G1bDk/mCNfP4S6ymQyyGU2jOej89hhUeH7c0J4YcQIV2g==
+dbgate-tools@^4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/dbgate-tools/-/dbgate-tools-4.0.0-rc.1.tgz#bbc284c50702eb6bb54d505cd0b3feb578e64612"
+  integrity sha512-lgQZNZAolC5poqIPHu60Pt6581QXbVe2IH5YduO2Z7N2DwOwqYUjGDnrhq9zxE9vt9eXyuWOiPSBUNxEGmnoKw==
   dependencies:
     lodash "^4.17.15"
 
@@ -1998,9 +1998,9 @@ locate-path@^3.0.0:
     path-exists "^3.0.0"
 
 lodash@^4.17.15:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 long@^4.0.0:
   version "4.0.0"

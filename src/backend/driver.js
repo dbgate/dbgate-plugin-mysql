@@ -29,7 +29,7 @@ async function runQueryItem(connection, sql) {
     connection.query(sql, function (error, results, fields) {
       if (error) reject(error);
       const columns = extractColumns(fields);
-      resolve({ rows: results && results.map && results.map((row) => zipDataRow(row, columns)), columns });
+      resolve({ rows: results && columns && results.map && results.map((row) => zipDataRow(row, columns)), columns });
     });
   });
 }
@@ -62,13 +62,15 @@ async function runStreamItem(connection, sql, options) {
           severity: 'info',
         });
       } else {
-        options.row(zipDataRow(row, columns));
+        if (columns) {
+          options.row(zipDataRow(row, columns));
+        }
       }
     };
 
     const handleFields = (fields) => {
       columns = extractColumns(fields);
-      options.recordset(columns);
+      if (columns) options.recordset(columns);
     };
 
     const handleError = (error) => {

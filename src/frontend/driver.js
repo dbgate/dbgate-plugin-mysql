@@ -6,6 +6,9 @@ const dialect = {
   rangeSelect: true,
   stringEscapeChar: '\\',
   fallbackDataType: 'longtext',
+  enableConstraintsPerTable: false,
+  anonymousPrimaryKey: true,
+  explicitDropConstraint: true,
   quoteIdentifier(s) {
     return '`' + s + '`';
   },

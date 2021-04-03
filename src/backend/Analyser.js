@@ -98,25 +98,30 @@ class Analyser extends DatabaseAnalyser {
 
     const viewTexts = await this.getViewTexts(views.rows.map((x) => x.pureName));
 
-    return this.mergeAnalyseResult(
-      {
-        tables: tables.rows.map((table) => ({
-          ...table,
-          columns: columns.rows.filter((col) => col.pureName == table.pureName).map(getColumnInfo),
-          primaryKey: DatabaseAnalyser.extractPrimaryKeys(table, pkColumns.rows),
-          foreignKeys: DatabaseAnalyser.extractForeignKeys(table, fkColumns.rows),
-        })),
-        views: views.rows.map((view) => ({
-          ...view,
-          columns: columns.rows.filter((col) => col.pureName == view.pureName).map(getColumnInfo),
-          createSql: viewTexts[view.pureName],
-          requiresFormat: true,
-        })),
-        procedures: programmables.rows.filter((x) => x.objectType == 'PROCEDURE').map(fp.omit(['objectType'])),
-        functions: programmables.rows.filter((x) => x.objectType == 'FUNCTION').map(fp.omit(['objectType'])),
-      },
-      (x) => x.pureName
-    );
+    return this.mergeAnalyseResult({
+      tables: tables.rows.map((table) => ({
+        ...table,
+        objectId: table.pureName,
+        columns: columns.rows.filter((col) => col.pureName == table.pureName).map(getColumnInfo),
+        primaryKey: DatabaseAnalyser.extractPrimaryKeys(table, pkColumns.rows),
+        foreignKeys: DatabaseAnalyser.extractForeignKeys(table, fkColumns.rows),
+      })),
+      views: views.rows.map((view) => ({
+        ...view,
+        objectId: view.pureName,
+        columns: columns.rows.filter((col) => col.pureName == view.pureName).map(getColumnInfo),
+        createSql: viewTexts[view.pureName],
+        requiresFormat: true,
+      })),
+      procedures: programmables.rows
+        .filter((x) => x.objectType == 'PROCEDURE')
+        .map(fp.omit(['objectType']))
+        .map((x) => ({ ...x, objectId: x.pureName })),
+      functions: programmables.rows
+        .filter((x) => x.objectType == 'FUNCTION')
+        .map(fp.omit(['objectType']))
+        .map((x) => ({ ...x, objectId: x.pureName })),
+    });
   }
 
   getDeletedObjectsForField(nameArray, objectTypeField) {
@@ -126,6 +131,7 @@ class Analyser extends DatabaseAnalyser {
         oldName: _.pick(x, ['pureName']),
         action: 'remove',
         objectTypeField,
+        objectId: x.pureName,
       }));
   }
 
@@ -198,11 +204,13 @@ class Analyser extends DatabaseAnalyser {
             oldName: _.pick(obj, ['pureName']),
             action: 'change',
             objectTypeField: field,
+            objectId: pureName,
           }
         : {
             newName: { pureName },
             action: 'add',
             objectTypeField: field,
+            objectId: pureName,
           };
       return action;
     });

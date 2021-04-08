@@ -158,7 +158,10 @@ const driver = {
       })
       .on('fields', (fields) => {
         columns = extractColumns(fields);
-        pass.write(structure || { columns });
+        pass.write({
+          __isStreamHeader: true,
+          ...(structure || { columns }),
+        });
       })
       .on('result', (row) => pass.write(zipDataRow(row, columns)))
       .on('end', () => pass.end());

@@ -27,37 +27,41 @@ class Dumper extends SqlDumper {
   }
 
   renameTable(obj, newName) {
-    this.putCmd("^rename ^table %f ^to %i", obj, newName);
+    this.putCmd('^rename ^table %f ^to %i', obj, newName);
   }
 
   changeColumn(oldcol, newcol, constraints) {
-    this.put("^alter ^table %f ^change ^column %i %i ", oldcol, oldcol.columnName, newcol.columnName);
+    this.put('^alter ^table %f ^change ^column %i %i ', oldcol, oldcol.columnName, newcol.columnName);
     this.columnDefinition(newcol, true, true, true);
     this.inlineConstraints(constraints);
     this.endCommand();
   }
 
   renameColumn(column, newcol) {
-    this.changeColumn(column, {
-      ...column,
-      columnName: newcol,
-    }, []);
+    this.changeColumn(
+      column,
+      {
+        ...column,
+        columnName: newcol,
+      },
+      []
+    );
   }
 
   enableConstraints(table, enabled) {
-    this.putCmd("^set FOREIGN_KEY_CHECKS = %s", enabled ? "1" : "0");
+    this.putCmd('^set FOREIGN_KEY_CHECKS = %s', enabled ? '1' : '0');
   }
 
   comment(value) {
-    this.put("/* %s */", value);
+    this.put('/* %s */', value);
   }
 
   beginTransaction() {
-    this.putCmd("^start ^transaction");
+    this.putCmd('^start ^transaction');
   }
 
   selectTableIntoNewTable(sourceName, targetName) {
-    this.putCmd("^create ^table %f (^select * ^from %f)", targetName, sourceName);
+    this.putCmd('^create ^table %f (^select * ^from %f)', targetName, sourceName);
   }
 }
 

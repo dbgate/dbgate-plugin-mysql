@@ -52,13 +52,13 @@ class Analyser extends DatabaseAnalyser {
       res = res.replace('=[OBJECT_NAME_CONDITION]', ' is not null');
     } else {
       const filterNames = this.modifications
-        .filter((x) => typeFields.includes(x.objectTypeField) && (x.action == 'add' || x.action == 'change'))
-        .map((x) => x.newName && x.newName.pureName)
+        .filter(x => typeFields.includes(x.objectTypeField) && (x.action == 'add' || x.action == 'change'))
+        .map(x => x.newName && x.newName.pureName)
         .filter(Boolean);
       if (filterNames.length == 0) {
         res = res.replace('=[OBJECT_NAME_CONDITION]', ' IS NULL');
       } else {
-        res = res.replace('=[OBJECT_NAME_CONDITION]', ` in (${filterNames.map((x) => `'${x}'`).join(',')})`);
+        res = res.replace('=[OBJECT_NAME_CONDITION]', ` in (${filterNames.map(x => `'${x}'`).join(',')})`);
       }
     }
     res = res.replace('#DATABASE#', this.pool._database_name);
@@ -71,7 +71,7 @@ class Analyser extends DatabaseAnalyser {
       if (typeField == 'views') return [pureName];
     }
     if (this.modifications) {
-      return this.modifications.filter((x) => x.objectTypeField == 'views').map((x) => x.newName.pureName);
+      return this.modifications.filter(x => x.objectTypeField == 'views').map(x => x.newName.pureName);
     }
     return allViewNames;
   }
@@ -96,38 +96,38 @@ class Analyser extends DatabaseAnalyser {
       this.createQuery('programmables', ['procedures', 'functions'])
     );
 
-    const viewTexts = await this.getViewTexts(views.rows.map((x) => x.pureName));
+    const viewTexts = await this.getViewTexts(views.rows.map(x => x.pureName));
 
     return this.mergeAnalyseResult({
-      tables: tables.rows.map((table) => ({
+      tables: tables.rows.map(table => ({
         ...table,
         objectId: table.pureName,
-        columns: columns.rows.filter((col) => col.pureName == table.pureName).map(getColumnInfo),
+        columns: columns.rows.filter(col => col.pureName == table.pureName).map(getColumnInfo),
         primaryKey: DatabaseAnalyser.extractPrimaryKeys(table, pkColumns.rows),
         foreignKeys: DatabaseAnalyser.extractForeignKeys(table, fkColumns.rows),
       })),
-      views: views.rows.map((view) => ({
+      views: views.rows.map(view => ({
         ...view,
         objectId: view.pureName,
-        columns: columns.rows.filter((col) => col.pureName == view.pureName).map(getColumnInfo),
+        columns: columns.rows.filter(col => col.pureName == view.pureName).map(getColumnInfo),
         createSql: viewTexts[view.pureName],
         requiresFormat: true,
       })),
       procedures: programmables.rows
-        .filter((x) => x.objectType == 'PROCEDURE')
+        .filter(x => x.objectType == 'PROCEDURE')
         .map(fp.omit(['objectType']))
-        .map((x) => ({ ...x, objectId: x.pureName })),
+        .map(x => ({ ...x, objectId: x.pureName })),
       functions: programmables.rows
-        .filter((x) => x.objectType == 'FUNCTION')
+        .filter(x => x.objectType == 'FUNCTION')
         .map(fp.omit(['objectType']))
-        .map((x) => ({ ...x, objectId: x.pureName })),
+        .map(x => ({ ...x, objectId: x.pureName })),
     });
   }
 
   getDeletedObjectsForField(nameArray, objectTypeField) {
     return this.structure[objectTypeField]
-      .filter((x) => !nameArray.includes(x.pureName))
-      .map((x) => ({
+      .filter(x => !nameArray.includes(x.pureName))
+      .map(x => ({
         oldName: _.pick(x, ['pureName']),
         action: 'remove',
         objectTypeField,
@@ -157,17 +157,17 @@ class Analyser extends DatabaseAnalyser {
     );
 
     const allModifications = _.compact([
-      ...tableModificationsQueryData.rows.map((x) => {
+      ...tableModificationsQueryData.rows.map(x => {
         if (x.objectType == 'BASE TABLE') return { ...x, objectTypeField: 'tables' };
         if (x.objectType == 'VIEW') return { ...x, objectTypeField: 'views' };
         return null;
       }),
-      ...procedureModificationsQueryData.rows.map((x) => ({
+      ...procedureModificationsQueryData.rows.map(x => ({
         objectTypeField: 'procedures',
         modifyDate: x.Modified,
         pureName: x.Name,
       })),
-      ...functionModificationsQueryData.rows.map((x) => ({
+      ...functionModificationsQueryData.rows.map(x => ({
         objectTypeField: 'functions',
         modifyDate: x.Modified,
         pureName: x.Name,
@@ -184,13 +184,13 @@ class Analyser extends DatabaseAnalyser {
     //   'MODs',
     //   this.structure.tables.map((x) => x.modifyDate)
     // );
-    const modifications = allModifications.map((x) => {
+    const modifications = allModifications.map(x => {
       const { objectType, modifyDate, pureName } = x;
       const field = objectTypeToField(objectType);
 
       if (!field || !this.structure[field]) return null;
       // @ts-ignore
-      const obj = this.structure[field].find((x) => x.pureName == pureName);
+      const obj = this.structure[field].find(x => x.pureName == pureName);
 
       // object not modified
       if (obj && Math.abs(new Date(modifyDate).getTime() - new Date(obj.modifyDate).getTime()) < 1000) return null;
@@ -215,7 +215,7 @@ class Analyser extends DatabaseAnalyser {
       return action;
     });
 
-    return [..._.compact(modifications), ...this.getDeletedObjects([...allModifications.map((x) => x.pureName)])];
+    return [..._.compact(modifications), ...this.getDeletedObjects([...allModifications.map(x => x.pureName)])];
   }
 }
 

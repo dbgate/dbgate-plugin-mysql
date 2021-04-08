@@ -14,7 +14,6 @@ const dialect = {
   },
 };
 
-
 /** @type {import('dbgate-types').EngineDriver} */
 const driver = {
   ...driverBase,
